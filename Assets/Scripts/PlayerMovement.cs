@@ -1,31 +1,68 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public float speed = 10;
+    public float speed = 5;
     private Rigidbody2D marioBody;
+    public float upSpeed = 10;
+    private bool onGroundState = true;
+    
+    public float maxSpeed = 20;
+    private SpriteRenderer marioSprite;
+    private bool faceRightState = true;
 
+    public TextMeshProUGUI scoreText;
+    public GameObject enemies;
+    public JumpOverGoomba jumpOverGoomba;
+
+    void OnCollisionEnter2D(Collision2D col)
+    {
+        if (col.gameObject.CompareTag("Ground")) onGroundState = true;
+    }
 
     // Start is called before the first frame update
     void Start()
     {
         // Set to be 30 FPS
-        Application.targetFrameRate = 30;
+        Application.targetFrameRate = 60;
         marioBody = GetComponent<Rigidbody2D>();
+        marioSprite = GetComponent<SpriteRenderer>();
 
     }
 
     // Update is called once per frame
     void Update()
     {
+        // toggle state
+        if (Input.GetKeyDown("a") && faceRightState)
+        {
+            faceRightState = false;
+            marioSprite.flipX = true;
+        }
 
+        if (Input.GetKeyDown("d") && !faceRightState)
+        {
+            faceRightState = true;
+            marioSprite.flipX = false;
+        }
+        
     }
-
     // FixedUpdate is called 50 times a second
-    public float maxSpeed = 20;
+    
 
+
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.gameObject.CompareTag("Enemy"))
+        {
+            Debug.Log("Collided with goomba!");
+            Time.timeScale = 0.0f;
+
+        }
+    }
     // FixedUpdate may be called once per frame. See documentation for details.
     void FixedUpdate()
     {
@@ -45,7 +82,41 @@ public class PlayerMovement : MonoBehaviour
             // stop
             marioBody.linearVelocity = Vector2.zero;
         }
+
+        if (Input.GetKeyDown("space") && onGroundState)
+        {
+            marioBody.AddForce(Vector2.up * upSpeed, ForceMode2D.Impulse);
+            onGroundState = false;
+        }
+        
     }
+    public void RestartButtonCallback(int input)
+    {
+        Debug.Log("Restart!");
+        // reset everything
+        ResetGame();
+        // resume time
+        Time.timeScale = 1.0f;
+    }
+
+    private void ResetGame()
+    {
+        // reset position
+        marioBody.transform.position = new Vector3(-4f, -2.5f, 0.0f); // change this position to actual starting position of Mario
+        // reset sprite direction 
+        faceRightState = true;
+        marioSprite.flipX = false;
+        // reset score
+        scoreText.text = "Score: 0";
+        // reset Goomba
+        foreach (Transform eachChild in enemies.transform)
+        {
+            eachChild.transform.localPosition = eachChild.GetComponent<EnemyMovement>().startPosition;
+        }
+        // reset score
+        jumpOverGoomba.score = 0;
+    }
+
 
 
 }
