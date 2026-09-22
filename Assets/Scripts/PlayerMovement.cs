@@ -14,10 +14,14 @@ public class PlayerMovement : MonoBehaviour
     private SpriteRenderer marioSprite;
     private bool faceRightState = true;
 
-    public TextMeshProUGUI scoreText;
+    public TextMeshProUGUI scoreTextGameOver;
     public GameObject enemies;
+    // Script
     public JumpOverGoomba jumpOverGoomba;
 
+    public GameObject GameOverPanel;
+
+    // Check if Mario is on the ground
     void OnCollisionEnter2D(Collision2D col)
     {
         if (col.gameObject.CompareTag("Ground")) onGroundState = true;
@@ -60,7 +64,8 @@ public class PlayerMovement : MonoBehaviour
         {
             Debug.Log("Collided with goomba!");
             Time.timeScale = 0.0f;
-
+            // CaLL Game Over function
+            GameOver();
         }
     }
     // FixedUpdate may be called once per frame. See documentation for details.
@@ -90,7 +95,21 @@ public class PlayerMovement : MonoBehaviour
         }
         
     }
-    public void RestartButtonCallback(int input)
+
+    // Game Over
+    void GameOver()
+    {
+        GameOverPanel.SetActive(true);
+
+        scoreTextGameOver.text = "Score: " + jumpOverGoomba.score.ToString();
+
+
+
+
+    }
+
+    // Button listener
+    public void RestartButtonCallback()
     {
         Debug.Log("Restart!");
         // reset everything
@@ -107,7 +126,7 @@ public class PlayerMovement : MonoBehaviour
         faceRightState = true;
         marioSprite.flipX = false;
         // reset score
-        scoreText.text = "Score: 0";
+        jumpOverGoomba.scoreTextInGame.text = "Score: 0";
         // reset Goomba
         foreach (Transform eachChild in enemies.transform)
         {
@@ -115,6 +134,11 @@ public class PlayerMovement : MonoBehaviour
         }
         // reset score
         jumpOverGoomba.score = 0;
+
+        // Hide Game Over panel
+        GameOverPanel.SetActive(false);
+
+
     }
 
 
