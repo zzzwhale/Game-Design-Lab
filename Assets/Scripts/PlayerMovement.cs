@@ -6,10 +6,11 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     public float speed = 5;
+    private bool jumpRequested;
     private Rigidbody2D marioBody;
     public float upSpeed = 10;
     private bool onGroundState = true;
-    
+
     public float maxSpeed = 20;
     private SpriteRenderer marioSprite;
     private bool faceRightState = true;
@@ -52,10 +53,15 @@ public class PlayerMovement : MonoBehaviour
             faceRightState = true;
             marioSprite.flipX = false;
         }
-        
+        // Capture input in Update so it's never missed 
+        if (Input.GetKeyDown("space"))
+        {
+            jumpRequested = true;
+        }
+
     }
     // FixedUpdate is called 50 times a second
-    
+
 
 
     void OnTriggerEnter2D(Collider2D other)
@@ -93,7 +99,15 @@ public class PlayerMovement : MonoBehaviour
             marioBody.AddForce(Vector2.up * upSpeed, ForceMode2D.Impulse);
             onGroundState = false;
         }
-        
+
+        // Apply jump in FixedUpdate
+        if (jumpRequested && onGroundState)
+        {
+            marioBody.AddForce(Vector2.up * upSpeed, ForceMode2D.Impulse);
+            onGroundState = false;
+        }
+        jumpRequested = false; // Reset flag
+
     }
 
     // Game Over

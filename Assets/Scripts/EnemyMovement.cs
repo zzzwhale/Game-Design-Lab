@@ -10,7 +10,7 @@ public class EnemyMovement : MonoBehaviour
     private float enemyPatroltime = 2.0f;
     private int moveRight = -1;
     private Vector2 velocity;
-    
+
     private Rigidbody2D enemyBody;
     public Vector3 startPosition = new Vector3(0.0f, 0.0f, 0.0f);
 
@@ -34,18 +34,19 @@ public class EnemyMovement : MonoBehaviour
         Debug.Log(other.gameObject.name);
     }
     // note that this is Update(), which still works but not ideal. See below.
-    void Update()
+    void FixedUpdate()
     {
         if (Mathf.Abs(enemyBody.position.x - originalX) < maxOffset)
-        {// move goomba
+        {
             Movegoomba();
         }
         else
         {
-            // change direction
             moveRight *= -1;
             ComputeVelocity();
             Movegoomba();
         }
     }
+
+
 }
